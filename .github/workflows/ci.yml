@@ -177,7 +177,18 @@ jobs:
           path: ${{ env.DIST }} 
 
       - name: List distribution files
-        run: ls -l ${{ env.DIST }} 
+        run: ls -l ${{ env.DIST }}
+
+      - name: Generate programs registry
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: ${{ env.PROGRAM_NAME }}
+        run: |
+          pixi run python -m modflow_devtools.programs.make_registry \
+            --repo ${{ github.repository }} \
+            --tag v${{ env.PROGRAM_VERSION }} \
+            --programs ${{ env.PROGRAM_NAME }} \
+            --output ../${{ env.DIST }}/programs.toml \
+            --verbose
 
         # create new release if manual trigger
       - name: Create release
